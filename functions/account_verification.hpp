@@ -3,20 +3,18 @@
 #include <unordered_map>
 #include <fstream>
 
-std::unordered_map<std::string, std::string> users;
-
 bool save_user(std::string username, std::string password){
 
     std::fstream file;
 
-    file.open("./accounts/users.txt", std::ios::app);
+    std::string userPath = "./accounts/" + username + ".txt"; 
+
+    file.open(userPath, std::ios::app);
 
     if(file.is_open()){
 
-        file << username + '\n';
         file << password + '\n';
-
-        users[username] = password;
+        file << "0.0\n";
 
     }
 
@@ -26,52 +24,40 @@ bool save_user(std::string username, std::string password){
 
 }
 
-void setHash(){
+bool check_valid_user(std::string username){
 
     std::fstream file;
 
-    file.open("./accounts/users.txt", std::ios::in);
+    std::string userPath = "./accounts/" + username + ".txt"; 
 
-    if(file.is_open()){
+    file.open(userPath, std::ios::in);
 
-        std::string line, username, password;
-        int i = 0;
-
-        while(getline(file, line)){
-
-            if(i % 2 == 0){
-
-                username = line;
-
-            }
-            else{
-
-                password = line;
-
-                users[username] = password;
-
-            }
-
-            i++;
-
-        }
-
-    }
-
-    file.close();
-
-}
-
-bool check_valid_user(std::string username){
-
-    return users[username].size() != 0 ? false : true;
+    if(file.is_open()) return false;
+    
+    return true;
 
 }
 
 bool check_login(std::string username, std::string password){
 
-    std::cout << users[username] << " " << password << std::endl;
+    std::fstream file;
 
-    return users[username] == password ? true : false;
+    std::string userPath =  "./accounts/" + username + ".txt";
+    std::string line;
 
+    file.open(userPath, std::ios::in);
+
+    if(file.is_open()){
+
+        while(getline(file, line)){
+
+            if(password == line) return true;
+
+            return false;
+
+        }
+
+    }
+
+    return false;
 }

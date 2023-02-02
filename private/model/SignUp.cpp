@@ -16,7 +16,7 @@ class SignUp {
 
             if(file.is_open()){
 
-                file << user.getUsername()'\n';
+                file << user.getUsername() + '\n';
                 file << user.getPassword() + '\n';
 
                 users[username] = password;
