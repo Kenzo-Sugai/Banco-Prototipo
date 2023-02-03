@@ -21,8 +21,10 @@ class Usuario {
         std::string username;
         std::string password;
         std::string balance;
-        std::string real = "00";
-        std::string centavos = "00";
+        int cash;
+        int cents;
+        int auxCash;
+        int auxCents;
 
         void saveFile();
 
@@ -57,7 +59,10 @@ Usuario::Usuario(std::string username){
 
                     parserMoney(line);
 
-                    this->balance = this->real + '.' + this->centavos;
+                    this->cash = this->auxCash;
+                    this->cents = this->auxCents;
+
+                    this->balance = std::to_string(this->cash) + '.' + std::to_string(this->cents);
 
                     break;
             }
@@ -81,7 +86,7 @@ void Usuario::parserMoney(std::string money){
 
     }
 
-    this->real = std::to_string(stoi(this->real) + stoi(aux));
+    this->auxCash = stoi(aux);
 
     aux = "";
 
@@ -93,7 +98,7 @@ void Usuario::parserMoney(std::string money){
 
     }
 
-    this->centavos = std::to_string(stoi(this->centavos) + stoi(aux));
+    this->auxCents = stoi(aux);
 
 }
 
@@ -111,39 +116,41 @@ void Usuario::setPassword(std::string password){
 
 void Usuario::setBalance(std::string money, char operation){
     // TODO_soma e sub
+
+    parserMoney(money);
+
     if(operation == '+'){
 
-        parserMoney(money);
+        int sobra = (this->cents + this->auxCents) / 100;
 
-        int sobra = stoi(this->centavos) / 100;
+        this->cash += this->auxCash + sobra;
 
-        this->real = std::to_string(stoi(this->real) + sobra);
-
-        this->centavos = std::to_string(stoi(this->centavos) % 100);
-
-        if(this->centavos.size() == 1) this->centavos = '0' + this->centavos; 
+        this->cents = (this->cents + this->auxCents) % 100;
 
     }
 
     if(operation == '-'){
 
-        int sobra = stoi(this->centavos) - stoi(this->real);
-        if(sobra < 0){
+        this->cash -= this->auxCash;
 
-            this->real = std::to_string(stoi(this->real) - 1);
-            this->centavos = std::to_string(100 - sobra);
+        this->cents -= this->auxCents;
 
-        }
-        else{
+        if(this->cents < 0){
 
-            this->centavos = std::to_string(sobra);
-            this->real = std::to_string();
+            this->cash--;
+            this->cents += 100;
 
         }
 
     }
 
-    this->balance = this->real + '.' + this->centavos;
+    std::string centsFormat = std::to_string(this->cents);
+
+    int size = centsFormat.size();
+
+    centsFormat = std::string(std::min(2, size), '0').append(centsFormat);
+
+    this->balance = std::to_string(this->cash) + '.' + centsFormat;
 
     saveFile();
 

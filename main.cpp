@@ -107,10 +107,11 @@ void menu(std::string username){
 
                 }
 
-                break;
-            default:
-                break;
+                if(choice == 2){
 
+                }
+
+                break;
 
         }
 
